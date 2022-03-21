@@ -1,0 +1,38 @@
+{
+  "generator-ngx-rocket": {
+    "version": "10.1.2",
+    "props": {
+      "location": "path",
+      "strict": true,
+      "skipInstall": false,
+      "skipQuickstart": false,
+      "initGit": true,
+      "usePrefix": true,
+      "appName": "UI Client",
+      "target": [
+        "web"
+      ],
+      "ui": "bootstrap",
+      "features": [
+        "auth",
+        "lazy"
+      ],
+      "languages": [
+        "en-US"
+      ],
+      "tools": [],
+      "utility": [],
+      "deploy": "none",
+      "projectName": "ui-client",
+      "packageManager": "npm",
+      "mobile": [],
+      "desktop": [],
+      "pwa": false,
+      "auth": true,
+      "lazy": true,
+      "e2e": false,
+      "cypress": false,
+      "angulartics": false
+    }
+  }
+}
