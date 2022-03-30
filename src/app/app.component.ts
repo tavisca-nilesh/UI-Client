@@ -8,6 +8,7 @@ import { filter, map, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { Logger, UntilDestroy, untilDestroyed } from '@shared';
 import { I18nService } from '@app/i18n';
+import { AuthService } from './auth/auth.service';
 
 const log = new Logger('App');
 
@@ -15,15 +16,17 @@ const log = new Logger('App');
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-
-  constructor(private router: Router,
-              private activatedRoute: ActivatedRoute,
-              private titleService: Title,
-              private translateService: TranslateService,
-              private i18nService: I18nService) { }
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private titleService: Title,
+    private translateService: TranslateService,
+    private i18nService: I18nService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     // Setup logger
@@ -33,11 +36,19 @@ export class AppComponent implements OnInit, OnDestroy {
 
     log.debug('init');
 
+    this.authService.checkAuth().subscribe((res) => {
+      log.debug('AppComponent - ngOnInit - app authenticated', res);
+      if (res.isAuthenticated) {
+        this.authService.setCredentials(res);
+      } else {
+        this.authService.doLogin();
+      }
+    });
 
     // Setup translations
     this.i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
 
-    const onNavigationEnd = this.router.events.pipe(filter(event => event instanceof NavigationEnd));
+    const onNavigationEnd = this.router.events.pipe(filter((event) => event instanceof NavigationEnd));
 
     // Change page title on navigation or language change, based on route data
     merge(this.translateService.onLangChange, onNavigationEnd)
@@ -49,11 +60,11 @@ export class AppComponent implements OnInit, OnDestroy {
           }
           return route;
         }),
-        filter(route => route.outlet === 'primary'),
-        switchMap(route => route.data),
+        filter((route) => route.outlet === 'primary'),
+        switchMap((route) => route.data),
         untilDestroyed(this)
       )
-      .subscribe(event => {
+      .subscribe((event) => {
         const title = event['title'];
         if (title) {
           this.titleService.setTitle(this.translateService.instant(title));
@@ -64,5 +75,4 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.i18nService.destroy();
   }
-
 }

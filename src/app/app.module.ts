@@ -12,7 +12,8 @@ import { HomeModule } from './home/home.module';
 import { ShellModule } from './shell/shell.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
+import { AuthConfigModule } from './auth/auth-config.module';
+import { AuthInterceptor } from 'angular-auth-oidc-client';
 @NgModule({
   imports: [
     BrowserModule,
@@ -25,7 +26,8 @@ import { AppRoutingModule } from './app-routing.module';
     ShellModule,
     HomeModule,
     AuthModule,
-    AppRoutingModule // must be imported as the last module as it contains the fallback route
+    AppRoutingModule,
+    AuthConfigModule // must be imported as the last module as it contains the fallback route
   ],
   declarations: [AppComponent],
   providers: [
@@ -42,6 +44,11 @@ import { AppRoutingModule } from './app-routing.module';
       {
         provide: RouteReuseStrategy,
         useClass: RouteReusableStrategy
+      },
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthInterceptor,
+        multi: true,
       },
   ],
   bootstrap: [AppComponent]
